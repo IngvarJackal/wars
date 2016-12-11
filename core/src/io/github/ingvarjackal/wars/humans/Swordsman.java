@@ -7,17 +7,14 @@ import io.github.ingvarjackal.wars.WarsServer;
 import io.github.ingvarjackal.wars.engine.Player;
 import io.github.ingvarjackal.wars.engine.Unit;
 
-public class Swordsman implements Unit {
+public class Swordsman extends Unit {
 
     public final static int cost = 10;
 
     private int hp = 4;
-    private int x;
-    private int y;
-    private final Player player;
 
     public Swordsman(Player player) {
-        this.player = player;
+        super(player);
     }
 
     @Override
@@ -41,40 +38,10 @@ public class Swordsman implements Unit {
     }
 
     @Override
-    public Player player() {
-        return player;
-    }
-
-    @Override
-    public int x() {
-        return x;
-    }
-
-    @Override
-    public int y() {
-        return y;
-    }
-
-    @Override
-    public void x(int x) {
-        this.x = x;
-    }
-
-    @Override
-    public void y(int y) {
-        this.y = y;
-    }
-
-    @Override
     public int str() {
         return 2;
     }
 
-    @Override
-    public void move(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
 
     @Override
     public int redHp(int damage) {

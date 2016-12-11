@@ -18,6 +18,7 @@ public class World {
     private final Building[][] buildings;
 
     private final int[][] swordsmanGradient;
+    private final int[][] infanrtyfurGradient;
 
     public World(Building[][] buildings) {
         XSIZE = buildings.length;
@@ -25,6 +26,7 @@ public class World {
         units = new Unit[XSIZE][YSIZE];
         this.buildings = buildings;
         swordsmanGradient = new int[XSIZE][YSIZE];
+        infanrtyfurGradient = new int[XSIZE][YSIZE];;
     }
 
     public void draw(SpriteBatch spriteBatch) {
@@ -48,7 +50,7 @@ public class World {
     private Capital furryPlayerSpawn;
     private Capital humanPlayerSpawn;
 
-    private void feedAndSpawn() {
+    private void feedAndSpawn() {/*
         List<Coordinate> coordinates = new ArrayList<Coordinate>(YSIZE * XSIZE);
         for (int i = 0; i < YSIZE; i++) {
             for (int j = 0; j < XSIZE; j++) {
@@ -64,7 +66,7 @@ public class World {
                 units[unit.x()][unit.y()] = null;
                 unit.player().food = 0;
             }
-        }
+        }*/
 
         if (furryPlayerSpawn == null || humanPlayerSpawn == null) {
             for (int i = 0; i < YSIZE; i++) {
@@ -110,15 +112,43 @@ public class World {
                 break;
             }
         }
-        // TODO: same for furry player
+
+        switch (getBiasedRandom(furryPlayerSpawn.owner().archers,
+                furryPlayerSpawn.owner().cavalary,
+                furryPlayerSpawn.owner().heavyInfantry,
+                furryPlayerSpawn.owner().infantry,
+                furryPlayerSpawn.owner().peasants,
+                10)) {
+            case 0: { // archers
+
+            }
+            case 1: { // cavalary
+
+            }
+            case 2: { // heavyInfantry
+
+            }
+            case 3: { // infantry
+                if (furryPlayerSpawn.owner().food >= Infantryfur.cost) {
+                    putClosest(furryPlayerSpawn.x(), furryPlayerSpawn.y(), new Infantryfur(furryPlayerSpawn.owner()), units, buildings);
+                    furryPlayerSpawn.owner().food -= Infantryfur.cost;
+                }
+            }
+            case 4: { // peasants
+
+            }
+            case 5: { // nothing
+                break;
+            }
+        }
     }
 
 
     /* CONQUERING
     */
     private void takeAndConquer() {
-        humanPlayerSpawn.owner().food += 5;
-        furryPlayerSpawn.owner().food += 5;
+        humanPlayerSpawn.owner().food += 15;
+        furryPlayerSpawn.owner().food += 15;
         for (int i = 0; i < YSIZE; i++) {
             for (int j = 0; j < XSIZE; j++) {
                 if (buildings[j][i] != null) {
@@ -186,29 +216,30 @@ public class World {
 
         for (Coordinate coordinate : coordinates) {
             Unit unit = units[coordinate.x][coordinate.y];
-            if (unit instanceof Swordsman) moveSwordsman((Swordsman) unit, swordsmanGradient, units, buildings);
+            if (unit instanceof Swordsman) moveInfantry(unit, swordsmanGradient, units, buildings);
+            if (unit instanceof Infantryfur) moveInfantry(unit, infanrtyfurGradient, units, buildings);
         }
     }
 
-    private static void moveSwordsman(Swordsman swordsman, int[][] swordsmanGradient, Unit[][] units, Building[][] buildings) {
-        int upScore = getSafe(swordsman.x(), swordsman.y() - 1, swordsmanGradient);
-        int downScore = getSafe(swordsman.x(), swordsman.y() + 1, swordsmanGradient);
-        int leftScore = getSafe(swordsman.x() - 1, swordsman.y(), swordsmanGradient);
-        int rightScore = getSafe(swordsman.x() + 1, swordsman.y(), swordsmanGradient);
-        int stayScore = getSafe(swordsman.x(), swordsman.y(), swordsmanGradient);
+    private static void moveInfantry(Unit unit, int[][] swordsmanGradient, Unit[][] units, Building[][] buildings) {
+        int upScore = getSafe(unit.x(), unit.y() - 1, swordsmanGradient);
+        int downScore = getSafe(unit.x(), unit.y() + 1, swordsmanGradient);
+        int leftScore = getSafe(unit.x() - 1, unit.y(), swordsmanGradient);
+        int rightScore = getSafe(unit.x() + 1, unit.y(), swordsmanGradient);
+        int stayScore = getSafe(unit.x(), unit.y(), swordsmanGradient);
 
         switch (getBiasedRandom(upScore, downScore, leftScore, rightScore, stayScore)) {
             case 0: { // upScore
-                if (moveUnit(swordsman, swordsman.x(), swordsman.y() - 1, units, buildings)) break;
+                if (moveUnit(unit, unit.x(), unit.y() - 1, units, buildings)) break;
             }
             case 1: { // downScore
-                if (moveUnit(swordsman, swordsman.x(), swordsman.y() + 1, units, buildings)) break;
+                if (moveUnit(unit, unit.x(), unit.y() + 1, units, buildings)) break;
             }
             case 2: { // leftScore
-                if (moveUnit(swordsman, swordsman.x() - 1, swordsman.y(), units, buildings)) break;
+                if (moveUnit(unit, unit.x() - 1, unit.y(), units, buildings)) break;
             }
             case 3: { // rightScore
-                if (moveUnit(swordsman, swordsman.x() + 1, swordsman.y(), units, buildings)) break;
+                if (moveUnit(unit, unit.x() + 1, unit.y(), units, buildings)) break;
             }
             case 4: { // stayScore
                 break;
@@ -233,8 +264,8 @@ public class World {
                 return false;
             }
         } else {
-            //return attackOrSwap(unit, unit2, units, buildings);
-            return false;
+            return attackOrSwap(unit, unit2, units, buildings);
+            //return false;
         }
     }
 
@@ -265,7 +296,9 @@ public class World {
             tile = (Building) findClosest(unit2.x(), unit2.y(), 2, Castle.class, buildings);
             if (tile != null && unit2.player().equals(tile.owner())) bonus = 0.25f;
             if (ThreadLocalRandom.current().nextFloat() > unit2.evasion() + bonus) {
-                unit2.redHp(unit.str());
+                if (unit2.redHp(unit.str()) < 0) {
+                    units[unit2.x()][unit2.y()] = null;
+                }
             }
             return true;
         }
@@ -284,6 +317,9 @@ public class World {
                 if (units[j][i] != null) {
                     if (units[j][i] instanceof Swordsman) updateSwordsmanGradients((Swordsman) units[j][i]);
                 }
+                if (units[j][i] != null) {
+                    if (units[j][i] instanceof Infantryfur) updateInfantryfurGradients((Infantryfur) units[j][i]);
+                }
             }
         }
     }
@@ -292,6 +328,7 @@ public class World {
         for (int i = 0; i < YSIZE; i++) {
             for (int j = 0; j < XSIZE; j++) {
                 swordsmanGradient[j][i] = GRADIENT_PREFIX;
+                infanrtyfurGradient[j][i] = GRADIENT_PREFIX;
             }
         }
         /*for (int i = 0; i < YSIZE; i++) {
@@ -307,17 +344,27 @@ public class World {
 
     private void updateCapitalGradients(Capital capital) {
         if (capital.owner().furries) {
-            makeGradient(capital.x(), capital.y(), 10000, 200, swordsmanGradient);
+            makeGradient(capital.x(), capital.y(), 2, swordsmanGradient);
+        } else {
+            makeGradient(capital.x(), capital.y(), 2, infanrtyfurGradient);
         }
     }
 
     private void updateSwordsmanGradients(Swordsman swordsman) {
-        //makeGradient(swordsman.x(), swordsman.y(), 1, 4, swordsmanGradient);
+        makeGradient(swordsman.x(), swordsman.y(), 50, 10, 5, infanrtyfurGradient);
     }
 
-    private void makeGradient(int xStart, int yStart, int value, int decay, int[][] gradient) {
+    private void updateInfantryfurGradients(Infantryfur infantryfur) {
+        makeGradient(infantryfur.x(), infantryfur.y(), 50, 10, 5, swordsmanGradient);
+    }
+
+    private void makeGradient(int xStart, int yStart, int decay, int[][] gradient) {
+        makeGradient(xStart, yStart, GRADIENT_PREFIX, decay, Integer.MAX_VALUE, gradient);
+    }
+
+    private void makeGradient(int xStart, int yStart, int value, int decay, int limit, int[][] gradient) {
         boolean changed = addSafe(xStart, yStart, value, gradient);
-        for (int i = 1; changed; i++) {
+        for (int i = 1; changed && i < limit ; i++) {
             changed = false;
             for (int x = 0; x <= i; x++) {
                 changed |= addSafe(xStart+x, yStart+i-x, value-i*decay, gradient);
@@ -412,7 +459,7 @@ public class World {
         for (int value : probabilities) {
             if (value < min) min = value;
         }
-        min -= 10;
+        min -= 5;
 
         long sum = 0;
         for (long value : probabilities) {

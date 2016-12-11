@@ -12,7 +12,7 @@ import io.github.ingvarjackal.wars.engine.Player;
 import io.github.ingvarjackal.wars.engine.World;
 
 public class WarsServer extends ApplicationAdapter {
-    private final static float FREQ = 0.1f; // sec
+    private final static float FREQ = 0.01f; // sec
 
 	public static AssetManager assetManager;
 	SpriteBatch batch;
@@ -27,10 +27,12 @@ public class WarsServer extends ApplicationAdapter {
         assetManager.load("capital.png", Texture.class);
         assetManager.load("furrycapital.png", Texture.class);
         assetManager.load("swordsman.png", Texture.class);
+        assetManager.load("infantryfur.png", Texture.class);
         assetManager.finishLoading();
         human = new Player(false, "Human");
         furry = new Player(true, "Furry");
         human.infantry = 10;
+        furry.infantry = 10;
         world = new World(new Building[][]{
                 {null, null, null, null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null, null, null, null},
