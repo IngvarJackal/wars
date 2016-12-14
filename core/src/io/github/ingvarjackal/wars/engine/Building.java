@@ -2,10 +2,26 @@ package io.github.ingvarjackal.wars.engine;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public interface Building {
-    int x();
-    int y();
-    void draw(SpriteBatch spriteBatch);
-    Player owner();
-    void owner(Player owner);
+public abstract class Building {
+    protected int x;
+    protected int y;
+    protected Player owner;
+
+    public final int x() {
+        return x;
+    }
+
+    public final int y() {
+        return y;
+    }
+
+    public final Player owner() {
+        return owner;
+    }
+
+    public final void owner(Player owner) {
+        this.owner = owner;
+    }
+
+    public abstract void draw(SpriteBatch spriteBatch);
 }

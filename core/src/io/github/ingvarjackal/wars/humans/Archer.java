@@ -5,6 +5,10 @@ import io.github.ingvarjackal.wars.engine.Player;
 import io.github.ingvarjackal.wars.engine.Unit;
 
 public class Archer extends Unit {
+    public final static int cost = 8;
+
+    private int hp = 2;
+
     protected Archer(Player player) {
         super(player);
     }
@@ -16,26 +20,27 @@ public class Archer extends Unit {
 
     @Override
     public int hp() {
-        return 0;
+        return hp;
     }
 
     @Override
     public int cost() {
-        return 0;
+        return cost;
     }
 
     @Override
     public float evasion() {
-        return 0;
+        return 0.3f;
     }
 
     @Override
     public int str() {
-        return 0;
+        return 1;
     }
 
     @Override
     public int redHp(int damage) {
-        return 0;
+        hp -= damage;
+        return hp;
     }
 }
