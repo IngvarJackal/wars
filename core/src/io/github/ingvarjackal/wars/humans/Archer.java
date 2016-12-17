@@ -1,6 +1,9 @@
 package io.github.ingvarjackal.wars.humans;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import io.github.ingvarjackal.wars.WarsServer;
 import io.github.ingvarjackal.wars.engine.Player;
 import io.github.ingvarjackal.wars.engine.Unit;
 
@@ -9,13 +12,13 @@ public class Archer extends Unit {
 
     private int hp = 2;
 
-    protected Archer(Player player) {
+    public Archer(Player player) {
         super(player);
     }
 
     @Override
     public void draw(SpriteBatch spriteBatch) {
-
+        spriteBatch.draw((Texture) WarsServer.assetManager.get("archer.png"), (x+1)*17, Gdx.graphics.getHeight()-(y+1)*17);
     }
 
     @Override

@@ -7,6 +7,10 @@ public abstract class Building {
     protected int y;
     protected Player owner;
 
+    public Building() {
+
+    }
+
     public final int x() {
         return x;
     }

@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class World {
-    private final static int GRADIENT_PREFIX = 100;
+    private final static int GRADIENT_PREFIX = 5000;
 
     private final int XSIZE;
     private final int YSIZE;
@@ -19,6 +19,8 @@ public class World {
 
     private final int[][] swordsmanGradient;
     private final int[][] infanrtyfurGradient;
+    private final int[][] arbalesterGradient;
+    private final int[][] archerGradient;
 
     public World(Building[][] buildings) {
         XSIZE = buildings.length;
@@ -26,7 +28,9 @@ public class World {
         units = new Unit[XSIZE][YSIZE];
         this.buildings = buildings;
         swordsmanGradient = new int[XSIZE][YSIZE];
-        infanrtyfurGradient = new int[XSIZE][YSIZE];;
+        infanrtyfurGradient = new int[XSIZE][YSIZE];
+        arbalesterGradient = new int[XSIZE][YSIZE];
+        archerGradient = new int[XSIZE][YSIZE];
     }
 
     public void draw(SpriteBatch spriteBatch) {
@@ -50,7 +54,7 @@ public class World {
     private Capital furryPlayerSpawn;
     private Capital humanPlayerSpawn;
 
-    private void feedAndSpawn() {/*
+    private void feedAndSpawn() {
         List<Coordinate> coordinates = new ArrayList<Coordinate>(YSIZE * XSIZE);
         for (int i = 0; i < YSIZE; i++) {
             for (int j = 0; j < XSIZE; j++) {
@@ -63,10 +67,10 @@ public class World {
             Unit unit = units[coordinate.x][coordinate.y];
             unit.player().food -= unit.cost() / 4;
             if (unit.player().food < 0) {
-                units[unit.x()][unit.y()] = null;
+                units[unit.x()][unit.y()].redHp(1);
                 unit.player().food = 0;
             }
-        }*/
+        }
 
         if (furryPlayerSpawn == null || humanPlayerSpawn == null) {
             for (int i = 0; i < YSIZE; i++) {
@@ -85,15 +89,18 @@ public class World {
         }
 
         switch (getBiasedRandom(humanPlayerSpawn.owner().archers,
-                humanPlayerSpawn.owner().cavalary,
+                humanPlayerSpawn.owner().chivalry,
                 humanPlayerSpawn.owner().heavyInfantry,
                 humanPlayerSpawn.owner().infantry,
                 humanPlayerSpawn.owner().peasants,
                 10)) {
             case 0: { // archers
-
+                if (humanPlayerSpawn.owner().food >= Archer.cost) {
+                    putClosest(humanPlayerSpawn.x(), humanPlayerSpawn.y(), new Archer(humanPlayerSpawn.owner()), units, buildings);
+                    humanPlayerSpawn.owner().food -= Archer.cost;
+                }
             }
-            case 1: { // cavalary
+            case 1: { // chivalry
 
             }
             case 2: { // heavyInfantry
@@ -114,15 +121,18 @@ public class World {
         }
 
         switch (getBiasedRandom(furryPlayerSpawn.owner().archers,
-                furryPlayerSpawn.owner().cavalary,
+                furryPlayerSpawn.owner().chivalry,
                 furryPlayerSpawn.owner().heavyInfantry,
                 furryPlayerSpawn.owner().infantry,
                 furryPlayerSpawn.owner().peasants,
                 10)) {
             case 0: { // archers
-
+                if (furryPlayerSpawn.owner().food >= Arbalester.cost) {
+                    putClosest(furryPlayerSpawn.x(), furryPlayerSpawn.y(), new Arbalester(furryPlayerSpawn.owner()), units, buildings);
+                    furryPlayerSpawn.owner().food -= Arbalester.cost;
+                }
             }
-            case 1: { // cavalary
+            case 1: { // chivalry
 
             }
             case 2: { // heavyInfantry
@@ -171,15 +181,14 @@ public class World {
                         }
                     }
                     if (building instanceof Farm || building instanceof Castle) {
-                        if (building.owner() == null) {
-                            if (furry == null && human != null) {
-                                building.owner(humanPlayerSpawn.owner());
-                            }
-                            if (furry != null && human == null) {
-                                building.owner(furryPlayerSpawn.owner());
-                            }
-                        } else {
+                        if (building.owner() != null) {
                             building.owner().food += 10;
+                        }
+                        if (furry == null && human != null) {
+                            building.owner(humanPlayerSpawn.owner());
+                        }
+                        if (furry != null && human == null) {
+                            building.owner(furryPlayerSpawn.owner());
                         }
                     }
                 }
@@ -187,7 +196,7 @@ public class World {
                     Unit unit = units[j][i];
                     if (unit instanceof Peasant || unit instanceof Graizer) {
                         int bonus = 0;
-                        Building farm = (Building) findClosest(unit.x(), unit.y(), 3, Farm.class, buildings);
+                        Building farm = findClosest(unit.x(), unit.y(), 3, Farm.class, buildings);
                         if (farm != null) {
                             if (unit.player().equals(farm.owner())) {
                                 bonus += 4;
@@ -218,15 +227,17 @@ public class World {
             Unit unit = units[coordinate.x][coordinate.y];
             if (unit instanceof Swordsman) moveInfantry(unit, swordsmanGradient, units, buildings);
             if (unit instanceof Infantryfur) moveInfantry(unit, infanrtyfurGradient, units, buildings);
+            if (unit instanceof Arbalester) moveArchers(unit, arbalesterGradient, units, buildings);
+            if (unit instanceof Archer) moveArchers(unit, archerGradient, units, buildings);
         }
     }
 
-    private static void moveInfantry(Unit unit, int[][] swordsmanGradient, Unit[][] units, Building[][] buildings) {
-        int upScore = getSafe(unit.x(), unit.y() - 1, swordsmanGradient);
-        int downScore = getSafe(unit.x(), unit.y() + 1, swordsmanGradient);
-        int leftScore = getSafe(unit.x() - 1, unit.y(), swordsmanGradient);
-        int rightScore = getSafe(unit.x() + 1, unit.y(), swordsmanGradient);
-        int stayScore = getSafe(unit.x(), unit.y(), swordsmanGradient);
+    private static void moveInfantry(Unit unit, int[][] gradient, Unit[][] units, Building[][] buildings) {
+        int upScore = getSafe(unit.x(), unit.y() - 1, gradient);
+        int downScore = getSafe(unit.x(), unit.y() + 1, gradient);
+        int leftScore = getSafe(unit.x() - 1, unit.y(), gradient);
+        int rightScore = getSafe(unit.x() + 1, unit.y(), gradient);
+        int stayScore = getSafe(unit.x(), unit.y(), gradient);
 
         switch (getBiasedRandom(upScore, downScore, leftScore, rightScore, stayScore)) {
             case 0: { // upScore
@@ -246,6 +257,138 @@ public class World {
             }
         }
     }
+
+    private static void moveArchers(Unit unit, int[][] gradient, Unit[][] units, Building[][] buildings) {
+        int n = getSafe(unit.x(), unit.y() - 1, gradient);
+        int s = getSafe(unit.x(), unit.y() + 1, gradient);
+        int w = getSafe(unit.x() - 1, unit.y(), gradient);
+        int e = getSafe(unit.x() + 1, unit.y(), gradient);
+        int stayScore = getSafe(unit.x(), unit.y(), gradient);
+
+        Unit swUnit = getSafe(unit.x() - 1, unit.y() + 1, units);
+        Unit seUnit = getSafe(unit.x() + 1, unit.y() + 1, units);
+        Unit nwUnit = getSafe(unit.x() - 1, unit.y() - 1, units);
+        Unit neUnit = getSafe(unit.x() + 1, unit.y() - 1, units);
+        Unit ssUnit = getSafe(unit.x(), unit.y() + 2, units);
+        Unit nnUnit = getSafe(unit.x(), unit.y() - 2, units);
+        Unit wwUnit = getSafe(unit.x() - 2, unit.y(), units);
+        Unit eeUnit = getSafe(unit.x() + 2, unit.y(), units);
+
+        int sw = swUnit != null && swUnit.player != unit.player ? 1000 : 0;
+        int se = seUnit != null && seUnit.player != unit.player ? 1000 : 0;
+        int nw = nwUnit != null && nwUnit.player != unit.player ? 1000 : 0;
+        int ne = neUnit != null && neUnit.player != unit.player ? 1000 : 0;
+        int ss = ssUnit != null && ssUnit.player != unit.player ? 1000 : 0;
+        int nn = nnUnit != null && nnUnit.player != unit.player ? 1000 : 0;
+        int ww = wwUnit != null && wwUnit.player != unit.player ? 1000 : 0;
+        int ee = eeUnit != null && eeUnit.player != unit.player ? 1000 : 0;
+
+        if (sw+se+nw+ne+ss+nn+ww+ee != 0) {
+            switch (getBiasedRandom(sw, se, nw, ne, ss, nn, ww, ee)) {
+                case 0: { // sw
+                    if (sw == 1000) attack(unit, swUnit, units, buildings);
+                }
+                case 1: { // se
+                    if (se == 1000) attack(unit, seUnit, units, buildings);
+                }
+                case 2: { // nw
+                    if (nw == 1000) attack(unit, nwUnit, units, buildings);
+                }
+                case 3: { // ne
+                    if (ne == 1000) attack(unit, neUnit, units, buildings);
+                }
+                case 4: { // ss
+                    if (ss == 1000) attack(unit, ssUnit, units, buildings);
+                }
+                case 5: { // nn
+                    if (nn == 1000) attack(unit, nnUnit, units, buildings);
+                }
+                case 6: { // ww
+                    if (ww == 1000) attack(unit, wwUnit, units, buildings);
+                }
+                case 7: { // ee
+                    if (ee == 1000) attack(unit, eeUnit, units, buildings);
+                }
+            }
+        } else {
+            switch (getBiasedRandom(n, s, w, e, stayScore)) {
+                case 0: { // n
+                    if (moveUnit(unit, unit.x(), unit.y() - 1, units, buildings)) break;
+                }
+                case 1: { // s
+                    if (moveUnit(unit, unit.x(), unit.y() + 1, units, buildings)) break;
+                }
+                case 2: { // w
+                    if (moveUnit(unit, unit.x() - 1, unit.y(), units, buildings)) break;
+                }
+                case 3: { // e
+                    if (moveUnit(unit, unit.x() + 1, unit.y(), units, buildings)) break;
+                }
+                case 4: { // stayScore
+                    break;
+                }
+            }
+        }
+    }
+
+    /*private static void moveChivalry(Unit unit, int[][] gradient, Unit[][] units, Building[][] buildings) {
+        int n = getSafe(unit.x(), unit.y() - 1, gradient);
+        int s = getSafe(unit.x(), unit.y() + 1, gradient);
+        int w = getSafe(unit.x() - 1, unit.y(), gradient);
+        int e = getSafe(unit.x() + 1, unit.y(), gradient);
+
+        int sw = getSafe(unit.x() - 1, unit.y() + 1, gradient);
+        int se = getSafe(unit.x() + 1, unit.y() + 1, gradient);
+        int nw = getSafe(unit.x() - 1, unit.y() - 1, gradient);
+        int ne = getSafe(unit.x() + 1, unit.y() - 1, gradient);
+        int ss = getSafe(unit.x(), unit.y() + 2, gradient);
+        int nn = getSafe(unit.x(), unit.y() - 2, gradient);
+        int ww = getSafe(unit.x() - 2, unit.y(), gradient);
+        int ee = getSafe(unit.x() + 2, unit.y(), gradient);
+        int stayScore = getSafe(unit.x(), unit.y(), gradient);
+
+        switch (getBiasedRandom(n, s, w, e, sw, se, nw, ne, ss, nn, ww, ee, stayScore)) {
+            case 0: { // n
+                if (moveUnit(unit, unit.x(), unit.y() - 1, units, buildings)) break;
+            }
+            case 1: { // s
+                if (moveUnit(unit, unit.x(), unit.y() + 1, units, buildings)) break;
+            }
+            case 2: { // w
+                if (moveUnit(unit, unit.x() - 1, unit.y(), units, buildings)) break;
+            }
+            case 3: { // e
+                if (moveUnit(unit, unit.x() + 1, unit.y(), units, buildings)) break;
+            }
+            case 4: { // sw
+                if (moveUnit(unit, unit.x(), unit.y() - 1, units, buildings)) break;
+            }
+            case 5: { // se
+                if (moveUnit(unit, unit.x(), unit.y() + 1, units, buildings)) break;
+            }
+            case 6: { // nw
+                if (moveUnit(unit, unit.x() - 1, unit.y(), units, buildings)) break;
+            }
+            case 7: { // ne
+                if (moveUnit(unit, unit.x() + 1, unit.y(), units, buildings)) break;
+            }
+            case 8: { // ss
+                if (moveUnit(unit, unit.x(), unit.y() - 1, units, buildings)) break;
+            }
+            case 9: { // nn
+                if (moveUnit(unit, unit.x(), unit.y() + 1, units, buildings)) break;
+            }
+            case 10: { // ww
+                if (moveUnit(unit, unit.x() - 1, unit.y(), units, buildings)) break;
+            }
+            case 11: { // ee
+                if (moveUnit(unit, unit.x() + 1, unit.y(), units, buildings)) break;
+            }
+            case 12: { // stayScore
+                break;
+            }
+        }
+    }*/
 
     private static boolean moveUnit(Unit unit, int x, int y, Unit[][] units, Building[][] buildings) {;
         Building building = getSafe(x, y, buildings);
@@ -274,34 +417,58 @@ public class World {
             if (unit instanceof Swordsman) {
                 if (unit2 instanceof Peasant ||
                         unit2 instanceof Archer) {
-                    if (setSafe(unit2.x(), unit2.y(), unit, units)) {
-                        units[unit.x()][unit.y()] = unit2;
-                        int x2 = unit2.x();
-                        int y2 = unit2.y();
-                        unit2.x(unit.x());
-                        unit2.y(unit.y());
-                        unit.x(x2);
-                        unit.y(y2);
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return swap(unit, unit2, units);
+                }
+            }
+            if (unit instanceof Infantryfur) {
+                if (unit2 instanceof Graizer ||
+                        unit2 instanceof Arbalester) {
+                    return swap(unit, unit2, units);
+                }
+            }
+            if (unit instanceof Archer) {
+                if (unit2 instanceof Peasant) {
+                    return swap(unit, unit2, units);
+                }
+            }
+            if (unit instanceof Arbalester) {
+                if (unit2 instanceof Peasant) {
+                    return swap(unit, unit2, units);
                 }
             }
             return false;
         } else {
-            float bonus = 0f;
-            Building tile = getSafe(unit2.x(), unit2.y(), buildings);
-            if (tile != null && tile instanceof Forest) bonus = 0.15f;
-            tile = (Building) findClosest(unit2.x(), unit2.y(), 2, Castle.class, buildings);
-            if (tile != null && unit2.player().equals(tile.owner())) bonus = 0.25f;
-            if (ThreadLocalRandom.current().nextFloat() > unit2.evasion() + bonus) {
-                if (unit2.redHp(unit.str()) < 0) {
-                    units[unit2.x()][unit2.y()] = null;
-                }
-            }
-            return true;
+            return attack(unit, unit2, units, buildings);
         }
+    }
+
+    private static boolean swap(Unit unit, Unit unit2, Unit[][] units) {
+        if (setSafe(unit2.x(), unit2.y(), unit, units)) {
+            units[unit.x()][unit.y()] = unit2;
+            int x2 = unit2.x();
+            int y2 = unit2.y();
+            unit2.x(unit.x());
+            unit2.y(unit.y());
+            unit.x(x2);
+            unit.y(y2);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean attack(Unit unit, Unit unit2, Unit[][] units, Building[][] buildings) {
+        float bonus = 0f;
+        Building tile = getSafe(unit2.x(), unit2.y(), buildings);
+        if (tile != null && tile instanceof Forest) bonus = 0.25f;
+        tile = (Building) findClosest(unit2.x(), unit2.y(), 2, Castle.class, buildings);
+        if (tile != null && unit2.player().equals(tile.owner())) bonus = 0.5f;
+        if (ThreadLocalRandom.current().nextFloat() > unit2.evasion() + bonus) {
+            if (unit2.redHp(unit.str()) < 0) {
+                units[unit2.x()][unit2.y()] = null;
+            }
+        }
+        return true;
     }
 
     /* GRADIENTS
@@ -313,12 +480,13 @@ public class World {
             for (int j = 0; j < XSIZE; j++) {
                 if (buildings[j][i] != null) {
                     if (buildings[j][i] instanceof Capital) updateCapitalGradients((Capital) buildings[j][i]);
+                    if (buildings[j][i] instanceof Castle) updateCastleGradients((Castle) buildings[j][i]);
                 }
                 if (units[j][i] != null) {
                     if (units[j][i] instanceof Swordsman) updateSwordsmanGradients((Swordsman) units[j][i]);
-                }
-                if (units[j][i] != null) {
                     if (units[j][i] instanceof Infantryfur) updateInfantryfurGradients((Infantryfur) units[j][i]);
+                    if (units[j][i] instanceof Arbalester) updateArbalesterGradients((Arbalester) units[j][i]);
+                    if (units[j][i] instanceof Archer) updateArcherGradients((Archer) units[j][i]);
                 }
             }
         }
@@ -345,17 +513,58 @@ public class World {
     private void updateCapitalGradients(Capital capital) {
         if (capital.owner().furries) {
             makeGradient(capital.x(), capital.y(), 2, swordsmanGradient);
+            makeGradient(capital.x(), capital.y(), 2, archerGradient);
         } else {
             makeGradient(capital.x(), capital.y(), 2, infanrtyfurGradient);
+            makeGradient(capital.x(), capital.y(), 2, arbalesterGradient);
+        }
+    }
+
+    private void updateCastleGradients(Castle castle) {
+        if (castle.owner == null) {
+            makeGradient(castle.x(), castle.y(), 20, 2, 10, swordsmanGradient);
+            makeGradient(castle.x(), castle.y(), 20, 2, 10, archerGradient);
+            makeGradient(castle.x(), castle.y(), 20, 2, 10, infanrtyfurGradient);
+            makeGradient(castle.x(), castle.y(), 20, 2, 10, arbalesterGradient);
+        } else {
+            if (castle.owner().furries) {
+                makeGradient(castle.x(), castle.y(), 10, 2, 5, infanrtyfurGradient);
+                makeGradient(castle.x(), castle.y(), 20, 4, 5, arbalesterGradient);
+                makeGradient(castle.x(), castle.y(), 45, 3, 15, swordsmanGradient);
+                makeGradient(castle.x(), castle.y(), 45, 3, 15, archerGradient);
+            } else {
+                makeGradient(castle.x(), castle.y(), 10, 2, 5, swordsmanGradient);
+                makeGradient(castle.x(), castle.y(), 20, 4, 5, archerGradient);
+                makeGradient(castle.x(), castle.y(), 45, 3, 15, infanrtyfurGradient);
+                makeGradient(castle.x(), castle.y(), 45, 3, 15, arbalesterGradient);
+            }
         }
     }
 
     private void updateSwordsmanGradients(Swordsman swordsman) {
+        makeGradient(swordsman.x(), swordsman.y(), 10, 1, 10, swordsmanGradient);
         makeGradient(swordsman.x(), swordsman.y(), 50, 10, 5, infanrtyfurGradient);
+        makeGradient(swordsman.x(), swordsman.y(), 80, 10, 6, arbalesterGradient);
+        makeGradient(swordsman.x(), swordsman.y(), -40, -20, 2, arbalesterGradient);
     }
 
     private void updateInfantryfurGradients(Infantryfur infantryfur) {
+        makeGradient(infantryfur.x(), infantryfur.y(), 10, 1, 10, infanrtyfurGradient);
         makeGradient(infantryfur.x(), infantryfur.y(), 50, 10, 5, swordsmanGradient);
+        makeGradient(infantryfur.x(), infantryfur.y(), 80, 10, 6, archerGradient);
+        makeGradient(infantryfur.x(), infantryfur.y(), -40, -20, 2, archerGradient);
+    }
+
+    private void updateArbalesterGradients(Arbalester arbalester) {
+        makeGradient(arbalester.x(), arbalester.y(), 40, 4, 10, infanrtyfurGradient);
+        makeGradient(arbalester.x(), arbalester.y(), 80, 10, 5, swordsmanGradient);
+        makeGradient(arbalester.x(), arbalester.y(), 50, 10, 6, archerGradient);
+    }
+
+    private void updateArcherGradients(Archer archer) {
+        makeGradient(archer.x(), archer.y(), 30, 3, 10, swordsmanGradient);
+        makeGradient(archer.x(), archer.y(), 80, 10, 5, infanrtyfurGradient);
+        makeGradient(archer.x(), archer.y(), 50, 10, 6, arbalesterGradient);
     }
 
     private void makeGradient(int xStart, int yStart, int decay, int[][] gradient) {
@@ -455,8 +664,8 @@ public class World {
 
     @SafeVarargs
     private static int getBiasedRandom(int... probabilities) {
-        int min = Integer.MAX_VALUE;
-        for (int value : probabilities) {
+        long min = Integer.MAX_VALUE;
+        for (long value : probabilities) {
             if (value < min) min = value;
         }
         min -= 5;

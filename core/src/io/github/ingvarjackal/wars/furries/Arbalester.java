@@ -1,6 +1,9 @@
 package io.github.ingvarjackal.wars.furries;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import io.github.ingvarjackal.wars.WarsServer;
 import io.github.ingvarjackal.wars.engine.Player;
 import io.github.ingvarjackal.wars.engine.Unit;
 
@@ -9,13 +12,13 @@ public class Arbalester extends Unit {
 
     private int hp = 2;
 
-    protected Arbalester(Player player) {
+    public Arbalester(Player player) {
         super(player);
     }
 
     @Override
     public void draw(SpriteBatch spriteBatch) {
-
+        spriteBatch.draw((Texture) WarsServer.assetManager.get("arbalester.png"), (x+1)*17, Gdx.graphics.getHeight()-(y+1)*17);
     }
 
     @Override

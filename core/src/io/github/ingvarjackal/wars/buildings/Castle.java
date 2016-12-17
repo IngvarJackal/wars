@@ -5,8 +5,15 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import io.github.ingvarjackal.wars.WarsServer;
 import io.github.ingvarjackal.wars.engine.Building;
+import io.github.ingvarjackal.wars.engine.Player;
 
 public class Castle extends Building {
+    public Castle(Player owner, int x, int y) {
+        this.x = x;
+        this.y = y;
+        this.owner = owner;
+    }
+
     @Override
     public void draw(SpriteBatch spriteBatch) {
         if (owner == null) {
