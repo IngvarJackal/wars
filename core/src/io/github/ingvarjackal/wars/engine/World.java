@@ -274,6 +274,20 @@ public class World {
         Unit wwUnit = getSafe(unit.x() - 2, unit.y(), units);
         Unit eeUnit = getSafe(unit.x() + 2, unit.y(), units);
 
+        Unit nnnUnit = getSafe(unit.x(), unit.y() - 3, units);
+        Unit nnwUnit = getSafe(unit.x() - 1, unit.y() - 2, units);
+        Unit nwwUnit = getSafe(unit.x() - 2, unit.y() - 1, units);
+        Unit wwwUnit = getSafe(unit.x() - 3, unit.y(), units);
+        Unit nneUnit = getSafe(unit.x() + 1, unit.y() - 2, units);
+        Unit neeUnit = getSafe(unit.x() + 2, unit.y() - 1 , units);
+        Unit eeeUnit = getSafe(unit.x() + 3, unit.y(), units);
+        Unit sssUnit = getSafe(unit.x(), unit.y() + 3, units);
+        Unit sswUnit = getSafe(unit.x() - 1, unit.y() + 2, units);
+        Unit swwUnit = getSafe(unit.x() - 2, unit.y() + 1, units);
+        Unit sseUnit = getSafe(unit.x() + 1, unit.y() + 2, units);
+        Unit seeUnit = getSafe(unit.x() + 2, unit.y() + 1, units);
+
+
         int sw = swUnit != null && swUnit.player != unit.player ? 1000 : 0;
         int se = seUnit != null && seUnit.player != unit.player ? 1000 : 0;
         int nw = nwUnit != null && nwUnit.player != unit.player ? 1000 : 0;
@@ -283,7 +297,21 @@ public class World {
         int ww = wwUnit != null && wwUnit.player != unit.player ? 1000 : 0;
         int ee = eeUnit != null && eeUnit.player != unit.player ? 1000 : 0;
 
-        if (sw+se+nw+ne+ss+nn+ww+ee != 0) {
+        int nnn = nnnUnit != null && nnnUnit.player != unit.player ? 250 : 0;
+        int nnw = nnwUnit != null && nnwUnit.player != unit.player ? 250 : 0;
+        int nww = nwwUnit != null && nwwUnit.player != unit.player ? 250 : 0;
+        int www = wwwUnit != null && wwwUnit.player != unit.player ? 250 : 0;
+        int nne = nneUnit != null && nneUnit.player != unit.player ? 250 : 0;
+        int nee = neeUnit != null && neeUnit.player != unit.player ? 250 : 0;
+        int eee = eeeUnit != null && eeeUnit.player != unit.player ? 250 : 0;
+        int sss = sssUnit != null && sssUnit.player != unit.player ? 250 : 0;
+        int ssw = sswUnit != null && sswUnit.player != unit.player ? 250 : 0;
+        int sww = swwUnit != null && swwUnit.player != unit.player ? 250 : 0;
+        int sse = sseUnit != null && sseUnit.player != unit.player ? 250 : 0;
+        int see = seeUnit != null && seeUnit.player != unit.player ? 250 : 0;
+
+
+        if (sw+se+nw+ne+ss+nn+ww+ee+nnn+nnw+nww+www+nne+nee+eee+sss+ssw+sww+sse+see != 0) {
             switch (getBiasedRandom(sw, se, nw, ne, ss, nn, ww, ee)) {
                 case 0: { // sw
                     if (sw == 1000) attack(unit, swUnit, units, buildings);
@@ -308,6 +336,42 @@ public class World {
                 }
                 case 7: { // ee
                     if (ee == 1000) attack(unit, eeUnit, units, buildings);
+                }
+                case 8: { // nnn
+                    if (nnn == 250) attack(unit, nnnUnit, units, buildings);
+                }
+                case 9: { // nnw
+                    if (nnw == 250) attack(unit, nnwUnit, units, buildings);
+                }
+                case 10: { // nww
+                    if (nww == 250) attack(unit, nwwUnit, units, buildings);
+                }
+                case 11: { // www
+                    if (www == 250) attack(unit, wwwUnit, units, buildings);
+                }
+                case 12: { // nne
+                    if (nne == 250) attack(unit, nneUnit, units, buildings);
+                }
+                case 13: { // nee
+                    if (nee == 250) attack(unit, neeUnit, units, buildings);
+                }
+                case 14: { // eee
+                    if (eee == 250) attack(unit, eeeUnit, units, buildings);
+                }
+                case 15: { // sss
+                    if (sss == 250) attack(unit, sssUnit, units, buildings);
+                }
+                case 16: { // ssw
+                    if (ssw == 250) attack(unit, sswUnit, units, buildings);
+                }
+                case 17: { // sww
+                    if (sww == 250) attack(unit, swwUnit, units, buildings);
+                }
+                case 18: { // sse
+                    if (sse == 250) attack(unit, sseUnit, units, buildings);
+                }
+                case 19: { // see
+                    if (see == 250) attack(unit, seeUnit, units, buildings);
                 }
             }
         } else {
