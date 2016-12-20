@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import io.github.ingvarjackal.wars.buildings.Capital;
 import io.github.ingvarjackal.wars.buildings.Castle;
+import io.github.ingvarjackal.wars.buildings.Farm;
 import io.github.ingvarjackal.wars.engine.Building;
 import io.github.ingvarjackal.wars.engine.Player;
 import io.github.ingvarjackal.wars.engine.World;
@@ -34,13 +35,20 @@ public class WarsServer extends ApplicationAdapter {
         assetManager.load("castle.png", Texture.class);
         assetManager.load("furrycastle.png", Texture.class);
         assetManager.load("humancastle.png", Texture.class);
+        assetManager.load("graizer.png", Texture.class);
+        assetManager.load("peasant.png", Texture.class);
+        assetManager.load("farm.png", Texture.class);
+        assetManager.load("humanfarm.png", Texture.class);
+        assetManager.load("furryfarm.png", Texture.class);
         assetManager.finishLoading();
         human = new Player(false, "Human");
         furry = new Player(true, "Furry");
-        human.infantry = 200;
-        //human.archers = 10;
-        //furry.infantry = 10;
-        furry.archers = 200;
+        human.infantry = 10;
+        human.archers = 5;
+        human.peasants = 2;
+        furry.infantry = 10;
+        furry.archers = 5;
+        furry.peasants = 2;
         world = new World(new Building[][]{
                 {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
                 {null, new Capital(human,1, 1), null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
@@ -48,6 +56,7 @@ public class WarsServer extends ApplicationAdapter {
                 {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
                 {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
                 {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
+                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,new Farm(null, 17, 6),null,null,null},
                 {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
                 {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
                 {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
@@ -56,8 +65,7 @@ public class WarsServer extends ApplicationAdapter {
                 {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
                 {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
                 {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
+                {null, null, null, null, new Farm(null, 3, 15), null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
                 {null, null, new Castle(null, 2 ,16), null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
                 {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,new Capital(furry, 18, 17),null},
                 {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},

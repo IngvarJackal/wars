@@ -12,13 +12,13 @@ public class Peasant extends Unit {
 
     private int hp = 2;
 
-    protected Peasant(Player player) {
+    public Peasant(Player player) {
         super(player);
     }
 
     @Override
     public void draw(SpriteBatch spriteBatch) {
-        spriteBatch.draw((Texture) WarsServer.assetManager.get("archer.png"), (x+1)*17, Gdx.graphics.getHeight()-(y+1)*17);
+        spriteBatch.draw((Texture) WarsServer.assetManager.get("peasant.png"), (x+1)*17, Gdx.graphics.getHeight()-(y+1)*17);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class Peasant extends Unit {
 
     @Override
     public int str() {
-        return 1;
+        return 0;
     }
 
     @Override
