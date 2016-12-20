@@ -98,22 +98,24 @@ public class World {
                 if (humanPlayerSpawn.owner().food >= Archer.cost) {
                     putClosest(humanPlayerSpawn.x(), humanPlayerSpawn.y(), new Archer(humanPlayerSpawn.owner()), units, buildings);
                     humanPlayerSpawn.owner().food -= Archer.cost;
+                    break;
                 }
             }
             case 1: { // chivalry
-
+                break;
             }
             case 2: { // heavyInfantry
-
+                break;
             }
             case 3: { // infantry
                 if (humanPlayerSpawn.owner().food >= Swordsman.cost) {
                     putClosest(humanPlayerSpawn.x(), humanPlayerSpawn.y(), new Swordsman(humanPlayerSpawn.owner()), units, buildings);
                     humanPlayerSpawn.owner().food -= Swordsman.cost;
+                    break;
                 }
             }
             case 4: { // peasants
-
+                break;
             }
             case 5: { // nothing
                 break;
@@ -130,22 +132,24 @@ public class World {
                 if (furryPlayerSpawn.owner().food >= Arbalester.cost) {
                     putClosest(furryPlayerSpawn.x(), furryPlayerSpawn.y(), new Arbalester(furryPlayerSpawn.owner()), units, buildings);
                     furryPlayerSpawn.owner().food -= Arbalester.cost;
+                    break;
                 }
             }
             case 1: { // chivalry
-
+                break;
             }
             case 2: { // heavyInfantry
-
+                break;
             }
             case 3: { // infantry
                 if (furryPlayerSpawn.owner().food >= Infantryfur.cost) {
                     putClosest(furryPlayerSpawn.x(), furryPlayerSpawn.y(), new Infantryfur(furryPlayerSpawn.owner()), units, buildings);
                     furryPlayerSpawn.owner().food -= Infantryfur.cost;
+                    break;
                 }
             }
             case 4: { // peasants
-
+                break;
             }
             case 5: { // nothing
                 break;
@@ -297,81 +301,32 @@ public class World {
         int ww = wwUnit != null && wwUnit.player != unit.player ? 1000 : 0;
         int ee = eeUnit != null && eeUnit.player != unit.player ? 1000 : 0;
 
-        int nnn = nnnUnit != null && nnnUnit.player != unit.player ? 250 : 0;
-        int nnw = nnwUnit != null && nnwUnit.player != unit.player ? 250 : 0;
-        int nww = nwwUnit != null && nwwUnit.player != unit.player ? 250 : 0;
-        int www = wwwUnit != null && wwwUnit.player != unit.player ? 250 : 0;
-        int nne = nneUnit != null && nneUnit.player != unit.player ? 250 : 0;
-        int nee = neeUnit != null && neeUnit.player != unit.player ? 250 : 0;
-        int eee = eeeUnit != null && eeeUnit.player != unit.player ? 250 : 0;
-        int sss = sssUnit != null && sssUnit.player != unit.player ? 250 : 0;
-        int ssw = sswUnit != null && sswUnit.player != unit.player ? 250 : 0;
-        int sww = swwUnit != null && swwUnit.player != unit.player ? 250 : 0;
-        int sse = sseUnit != null && sseUnit.player != unit.player ? 250 : 0;
-        int see = seeUnit != null && seeUnit.player != unit.player ? 250 : 0;
 
-
-        if (sw+se+nw+ne+ss+nn+ww+ee+nnn+nnw+nww+www+nne+nee+eee+sss+ssw+sww+sse+see != 0) {
+        if (sw+se+nw+ne+ss+nn+ww+ee != 0) {
             switch (getBiasedRandom(sw, se, nw, ne, ss, nn, ww, ee)) {
                 case 0: { // sw
-                    if (sw == 1000) attack(unit, swUnit, units, buildings);
+                    if (sw == 1000) attack(unit, swUnit, 0.4f, units, buildings);
                 }
                 case 1: { // se
-                    if (se == 1000) attack(unit, seUnit, units, buildings);
+                    if (se == 1000) attack(unit, seUnit,0.4f, units, buildings);
                 }
                 case 2: { // nw
-                    if (nw == 1000) attack(unit, nwUnit, units, buildings);
+                    if (nw == 1000) attack(unit, nwUnit,0.4f, units, buildings);
                 }
                 case 3: { // ne
-                    if (ne == 1000) attack(unit, neUnit, units, buildings);
+                    if (ne == 1000) attack(unit, neUnit,0.4f, units, buildings);
                 }
                 case 4: { // ss
-                    if (ss == 1000) attack(unit, ssUnit, units, buildings);
+                    if (ss == 1000) attack(unit, ssUnit,0.4f, units, buildings);
                 }
                 case 5: { // nn
-                    if (nn == 1000) attack(unit, nnUnit, units, buildings);
+                    if (nn == 1000) attack(unit, nnUnit,0.4f, units, buildings);
                 }
                 case 6: { // ww
-                    if (ww == 1000) attack(unit, wwUnit, units, buildings);
+                    if (ww == 1000) attack(unit, wwUnit,0.4f, units, buildings);
                 }
                 case 7: { // ee
-                    if (ee == 1000) attack(unit, eeUnit, units, buildings);
-                }
-                case 8: { // nnn
-                    if (nnn == 250) attack(unit, nnnUnit, units, buildings);
-                }
-                case 9: { // nnw
-                    if (nnw == 250) attack(unit, nnwUnit, units, buildings);
-                }
-                case 10: { // nww
-                    if (nww == 250) attack(unit, nwwUnit, units, buildings);
-                }
-                case 11: { // www
-                    if (www == 250) attack(unit, wwwUnit, units, buildings);
-                }
-                case 12: { // nne
-                    if (nne == 250) attack(unit, nneUnit, units, buildings);
-                }
-                case 13: { // nee
-                    if (nee == 250) attack(unit, neeUnit, units, buildings);
-                }
-                case 14: { // eee
-                    if (eee == 250) attack(unit, eeeUnit, units, buildings);
-                }
-                case 15: { // sss
-                    if (sss == 250) attack(unit, sssUnit, units, buildings);
-                }
-                case 16: { // ssw
-                    if (ssw == 250) attack(unit, sswUnit, units, buildings);
-                }
-                case 17: { // sww
-                    if (sww == 250) attack(unit, swwUnit, units, buildings);
-                }
-                case 18: { // sse
-                    if (sse == 250) attack(unit, sseUnit, units, buildings);
-                }
-                case 19: { // see
-                    if (see == 250) attack(unit, seeUnit, units, buildings);
+                    if (ee == 1000) attack(unit, eeUnit,0.4f, units, buildings);
                 }
             }
         } else {
@@ -522,12 +477,15 @@ public class World {
     }
 
     private static boolean attack(Unit unit, Unit unit2, Unit[][] units, Building[][] buildings) {
-        float bonus = 0f;
+        return attack(unit, unit2, 0f, units, buildings);
+    }
+
+    private static boolean attack(Unit unit, Unit unit2, float bonus, Unit[][] units, Building[][] buildings) {
         Building tile = getSafe(unit2.x(), unit2.y(), buildings);
         if (tile != null && tile instanceof Forest) bonus = 0.25f;
-        tile = (Building) findClosest(unit2.x(), unit2.y(), 2, Castle.class, buildings);
+        tile = findClosest(unit2.x(), unit2.y(), 2, Castle.class, buildings);
         if (tile != null && unit2.player().equals(tile.owner())) bonus = 0.5f;
-        if (ThreadLocalRandom.current().nextFloat() > unit2.evasion() + bonus) {
+        if (ThreadLocalRandom.current().nextFloat() > Math.min(0.99f, Math.max(0.01f, unit2.evasion() + bonus))) {
             if (unit2.redHp(unit.str()) < 0) {
                 units[unit2.x()][unit2.y()] = null;
             }

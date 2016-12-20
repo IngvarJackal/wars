@@ -8,7 +8,7 @@ import io.github.ingvarjackal.wars.engine.Player;
 import io.github.ingvarjackal.wars.engine.Unit;
 
 public class Arbalester extends Unit {
-    public final static int cost = 8;
+    public final static int cost = 11;
 
     private int hp = 2;
 
@@ -33,7 +33,7 @@ public class Arbalester extends Unit {
 
     @Override
     public float evasion() {
-        return 0.3f;
+        return 0.1f;
     }
 
     @Override

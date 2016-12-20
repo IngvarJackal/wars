@@ -37,10 +37,10 @@ public class WarsServer extends ApplicationAdapter {
         assetManager.finishLoading();
         human = new Player(false, "Human");
         furry = new Player(true, "Furry");
-        human.infantry = 10;
-        human.archers = 10;
-        furry.infantry = 10;
-        furry.archers = 10;
+        human.infantry = 200;
+        //human.archers = 10;
+        //furry.infantry = 10;
+        furry.archers = 200;
         world = new World(new Building[][]{
                 {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
                 {null, new Capital(human,1, 1), null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},

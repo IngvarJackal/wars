@@ -38,4 +38,24 @@ public class Player {
     public int hashCode() {
         return name != null ? name.hashCode() : 0;
     }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "furries=" + furries +
+                ", name='" + name + '\'' +
+                ", offensive=" + offensive +
+                ", peasants=" + peasants +
+                ", infantry=" + infantry +
+                ", heavyInfantry=" + heavyInfantry +
+                ", archers=" + archers +
+                ", chivalry=" + chivalry +
+                ", peasantsFlags=" + peasantsFlags +
+                ", infantryFlags=" + infantryFlags +
+                ", heavyInfantryFlags=" + heavyInfantryFlags +
+                ", archersFlags=" + archersFlags +
+                ", cavalaryFlags=" + cavalaryFlags +
+                ", food=" + food +
+                '}';
+    }
 }

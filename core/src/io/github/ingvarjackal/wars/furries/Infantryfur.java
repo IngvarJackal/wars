@@ -10,7 +10,7 @@ import io.github.ingvarjackal.wars.engine.Unit;
 public class Infantryfur extends Unit{
     public final static int cost = 9;
 
-    private int hp = 4;
+    private int hp = 5;
 
     public Infantryfur(Player player) {
         super(player);
@@ -33,7 +33,7 @@ public class Infantryfur extends Unit{
 
     @Override
     public float evasion() {
-        return 0.4f;
+        return 0.3f;
     }
 
     @Override
