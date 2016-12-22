@@ -23,6 +23,8 @@ public class World {
     private final int[][] archerGradient;
     private final int[][] peasantGradient;
     private final int[][] graizerGradient;
+    private final int[][] griffonGradient;
+    private final int[][] wereGradient;
 
     public World(Building[][] buildings) {
         XSIZE = buildings.length;
@@ -35,6 +37,8 @@ public class World {
         archerGradient = new int[XSIZE][YSIZE];
         peasantGradient = new int[XSIZE][YSIZE];
         graizerGradient = new int[XSIZE][YSIZE];
+        griffonGradient = new int[XSIZE][YSIZE];
+        wereGradient = new int[XSIZE][YSIZE];
     }
 
     public void draw(SpriteBatch spriteBatch) {
@@ -97,7 +101,7 @@ public class World {
                 humanPlayerSpawn.owner().heavyInfantry,
                 humanPlayerSpawn.owner().infantry,
                 humanPlayerSpawn.owner().peasants,
-                10)) {
+                100)) {
             case 0: { // archers
                 if (humanPlayerSpawn.owner().food >= Archer.cost) {
                     putClosest(humanPlayerSpawn.x(), humanPlayerSpawn.y(), new Archer(humanPlayerSpawn.owner()), units, buildings);
@@ -106,7 +110,11 @@ public class World {
                 }
             }
             case 1: { // chivalry
-                break;
+                if (humanPlayerSpawn.owner().food >= Griffon.cost) {
+                    putClosest(humanPlayerSpawn.x(), humanPlayerSpawn.y(), new Griffon(humanPlayerSpawn.owner()), units, buildings);
+                    humanPlayerSpawn.owner().food -= Griffon.cost;
+                    break;
+                };
             }
             case 2: { // heavyInfantry
                 break;
@@ -135,7 +143,7 @@ public class World {
                 furryPlayerSpawn.owner().heavyInfantry,
                 furryPlayerSpawn.owner().infantry,
                 furryPlayerSpawn.owner().peasants,
-                10)) {
+                100)) {
             case 0: { // archers
                 if (furryPlayerSpawn.owner().food >= Arbalester.cost) {
                     putClosest(furryPlayerSpawn.x(), furryPlayerSpawn.y(), new Arbalester(furryPlayerSpawn.owner()), units, buildings);
@@ -144,7 +152,11 @@ public class World {
                 }
             }
             case 1: { // chivalry
-                break;
+                if (furryPlayerSpawn.owner().food >= Were.cost) {
+                    putClosest(furryPlayerSpawn.x(), furryPlayerSpawn.y(), new Were(furryPlayerSpawn.owner()), units, buildings);
+                    furryPlayerSpawn.owner().food -= Were.cost;
+                    break;
+                };
             }
             case 2: { // heavyInfantry
                 break;
@@ -180,13 +192,13 @@ public class World {
                 if (buildings[j][i] != null) {
                     Building building = buildings[j][i];
                     Object furry = findClosest(building.x(), building.y(), 1, Arbalester.class, units);
-                    if (furry == null) furry = findClosest(building.x(), building.y(), 1, Halberd.class, units);
+                    if (furry == null) furry = findClosest(building.x(), building.y(), 1, Hero.class, units);
                     if (furry == null) furry = findClosest(building.x(), building.y(), 1, Infantryfur.class, units);
                     if (furry == null) furry = findClosest(building.x(), building.y(), 1, Were.class, units);
 
                     Object human = findClosest(building.x(), building.y(), 1, Swordsman.class, units);
                     if (human == null) human = findClosest(building.x(), building.y(), 1, Archer.class, units);
-                    if (human == null) human = findClosest(building.x(), building.y(), 1, Knight.class, units);
+                    if (human == null) human = findClosest(building.x(), building.y(), 1, Griffon.class, units);
                     if (human == null) human = findClosest(building.x(), building.y(), 1, Champion.class, units);
                     if (building instanceof Capital) {
                         if (building.owner().furries && furry == null && human != null) {
@@ -247,6 +259,8 @@ public class World {
             if (unit instanceof Archer) moveArchers(unit, archerGradient, units, buildings);
             if (unit instanceof Peasant) moveInfantry(unit, peasantGradient, units, buildings);
             if (unit instanceof Graizer) moveInfantry(unit, graizerGradient, units, buildings);
+            if (unit instanceof Griffon) moveChivalry(unit, griffonGradient, units, buildings);
+            if (unit instanceof Were) moveChivalry(unit, wereGradient, units, buildings);
         }
     }
 
@@ -350,7 +364,7 @@ public class World {
         }
     }
 
-    /*private static void moveChivalry(Unit unit, int[][] gradient, Unit[][] units, Building[][] buildings) {
+    private static void moveChivalry(Unit unit, int[][] gradient, Unit[][] units, Building[][] buildings) {
         int n = getSafe(unit.x(), unit.y() - 1, gradient);
         int s = getSafe(unit.x(), unit.y() + 1, gradient);
         int w = getSafe(unit.x() - 1, unit.y(), gradient);
@@ -380,34 +394,38 @@ public class World {
                 if (moveUnit(unit, unit.x() + 1, unit.y(), units, buildings)) break;
             }
             case 4: { // sw
-                if (moveUnit(unit, unit.x(), unit.y() - 1, units, buildings)) break;
+                if (moveUnit(unit, unit.x() - 1, unit.y() + 1, units, buildings)) break;
             }
             case 5: { // se
-                if (moveUnit(unit, unit.x(), unit.y() + 1, units, buildings)) break;
+                if (moveUnit(unit, unit.x() + 1, unit.y() + 1, units, buildings)) break;
             }
             case 6: { // nw
-                if (moveUnit(unit, unit.x() - 1, unit.y(), units, buildings)) break;
+                if (moveUnit(unit, unit.x() - 1, unit.y() - 1, units, buildings)) break;
             }
             case 7: { // ne
-                if (moveUnit(unit, unit.x() + 1, unit.y(), units, buildings)) break;
+                if (moveUnit(unit, unit.x() + 1, unit.y() - 1, units, buildings)) break;
             }
             case 8: { // ss
-                if (moveUnit(unit, unit.x(), unit.y() - 1, units, buildings)) break;
+                if (moveUnit(unit, unit.x(), unit.y() + 2, units, buildings)) break;
+                else if (moveUnit(unit, unit.x(), unit.y() + 1, units, buildings)) break;
             }
             case 9: { // nn
-                if (moveUnit(unit, unit.x(), unit.y() + 1, units, buildings)) break;
+                if (moveUnit(unit, unit.x(), unit.y() - 2, units, buildings)) break;
+                else if (moveUnit(unit, unit.x(), unit.y() - 1, units, buildings)) break;
             }
             case 10: { // ww
-                if (moveUnit(unit, unit.x() - 1, unit.y(), units, buildings)) break;
+                if (moveUnit(unit, unit.x(), unit.y() - 2, units, buildings)) break;
+                else if (moveUnit(unit, unit.x(), unit.y() - 1, units, buildings)) break;
             }
             case 11: { // ee
-                if (moveUnit(unit, unit.x() + 1, unit.y(), units, buildings)) break;
+                if (moveUnit(unit, unit.x(), unit.y() + 2, units, buildings)) break;
+                else if (moveUnit(unit, unit.x(), unit.y() + 1, units, buildings)) break;
             }
             case 12: { // stayScore
                 break;
             }
         }
-    }*/
+    }
 
     private static boolean moveUnit(Unit unit, int x, int y, Unit[][] units, Building[][] buildings) {;
         Building building = getSafe(x, y, buildings);
@@ -483,6 +501,7 @@ public class World {
     private static boolean attack(Unit unit, Unit unit2, float bonus, Unit[][] units, Building[][] buildings) {
         Building tile = getSafe(unit2.x(), unit2.y(), buildings);
         if (tile != null && tile instanceof Forest) bonus = 0.25f;
+        if (tile != null && tile instanceof River) bonus = -0.75f;
         tile = findClosest(unit2.x(), unit2.y(), 2, Castle.class, buildings);
         if (tile != null && unit2.player().equals(tile.owner())) bonus = 0.5f;
         if (ThreadLocalRandom.current().nextFloat() > Math.min(0.99f, Math.max(0.01f, unit2.evasion() + bonus))) {
@@ -504,6 +523,9 @@ public class World {
                     if (buildings[j][i] instanceof Capital) updateCapitalGradients((Capital) buildings[j][i]);
                     if (buildings[j][i] instanceof Castle) updateCastleGradients((Castle) buildings[j][i]);
                     if (buildings[j][i] instanceof Farm) updateFarmGradients((Farm) buildings[j][i]);
+                    if (buildings[j][i] instanceof Forest) updateForestGradients((Forest) buildings[j][i]);
+                    if (buildings[j][i] instanceof River) updateRiverGradients((River) buildings[j][i]);
+                    if (buildings[j][i] instanceof Mountain) updateMountainGradients((Mountain) buildings[j][i]);
                 }
                 if (units[j][i] != null) {
                     if (units[j][i] instanceof Swordsman) updateSwordsmanGradients((Swordsman) units[j][i]);
@@ -512,6 +534,8 @@ public class World {
                     if (units[j][i] instanceof Archer) updateArcherGradients((Archer) units[j][i]);
                     if (units[j][i] instanceof Graizer) updateGraizerGradients((Graizer) units[j][i]);
                     if (units[j][i] instanceof Peasant) updatePeasantGradients((Peasant) units[j][i]);
+                    if (units[j][i] instanceof Griffon) updateGriffonGradients((Griffon) units[j][i]);
+                    if (units[j][i] instanceof Were) updateWereGradients((Were) units[j][i]);
                 }
             }
         }
@@ -522,28 +546,57 @@ public class World {
             for (int j = 0; j < XSIZE; j++) {
                 swordsmanGradient[j][i] = GRADIENT_PREFIX;
                 infanrtyfurGradient[j][i] = GRADIENT_PREFIX;
+                arbalesterGradient[j][i] = GRADIENT_PREFIX;
+                archerGradient[j][i] = GRADIENT_PREFIX;
+                peasantGradient[j][i] = GRADIENT_PREFIX;
+                graizerGradient[j][i] = GRADIENT_PREFIX;
             }
         }
-        /*for (int i = 0; i < YSIZE; i++) {
-            swordsmanGradient[0][i] = -GRADIENT_PREFIX;
-            swordsmanGradient[XSIZE - 1][i] = -GRADIENT_PREFIX;
-        }
-
-        for (int i = 0; i < XSIZE; i++) {
-            swordsmanGradient[i][0] = -GRADIENT_PREFIX;
-            swordsmanGradient[i][YSIZE - 1] = -GRADIENT_PREFIX;
-        }*/
     }
 
     private void updateCapitalGradients(Capital capital) {
         if (capital.owner().furries) {
-            makeGradient(capital.x(), capital.y(), 2, swordsmanGradient);
-            makeGradient(capital.x(), capital.y(), 2, archerGradient);
+            makeGradient(capital.x(), capital.y(), 4, swordsmanGradient);
+            makeGradient(capital.x(), capital.y(), 4, archerGradient);
+            makeGradient(capital.x(), capital.y(), 4, griffonGradient);
         } else {
-            makeGradient(capital.x(), capital.y(), 2, infanrtyfurGradient);
-            makeGradient(capital.x(), capital.y(), 2, arbalesterGradient);
+            makeGradient(capital.x(), capital.y(), 4, infanrtyfurGradient);
+            makeGradient(capital.x(), capital.y(), 4, arbalesterGradient);
+            makeGradient(capital.x(), capital.y(), 4, wereGradient);
         }
     }
+
+    private void updateMountainGradients(Mountain mountain) {
+        makeGradient(mountain.x(), mountain.y(), -100, -100, 1, infanrtyfurGradient);
+        makeGradient(mountain.x(), mountain.y(), -100, -100, 1, arbalesterGradient);
+        makeGradient(mountain.x(), mountain.y(), -100, -100, 1, swordsmanGradient);
+        makeGradient(mountain.x(), mountain.y(), -100, -100, 1, archerGradient);
+        makeGradient(mountain.x(), mountain.y(), -100, -100, 1, peasantGradient);
+        makeGradient(mountain.x(), mountain.y(), -100, -100, 1, graizerGradient);
+        makeGradient(mountain.x(), mountain.y(), -100, -100, 1, griffonGradient);
+        makeGradient(mountain.x(), mountain.y(), -100, -100, 1, wereGradient);
+    }
+
+    private void updateRiverGradients(River river) {
+        makeGradient(river.x(), river.y(), -50, -25, 2, infanrtyfurGradient);
+        makeGradient(river.x(), river.y(), -50, -25, 2, arbalesterGradient);
+        makeGradient(river.x(), river.y(), -50, -25, 2, swordsmanGradient);
+        makeGradient(river.x(), river.y(), -50, -25, 2, archerGradient);
+        makeGradient(river.x(), river.y(), -50, -25, 2, peasantGradient);
+        makeGradient(river.x(), river.y(), -50, -25, 2, graizerGradient);
+    }
+
+    private void updateForestGradients(Forest forest) {
+        makeGradient(forest.x(), forest.y(), 2, 2, 1, infanrtyfurGradient);
+        makeGradient(forest.x(), forest.y(), 2, 2, 1, arbalesterGradient);
+        makeGradient(forest.x(), forest.y(), 2, 2, 1, swordsmanGradient);
+        makeGradient(forest.x(), forest.y(), 2, 2, 1, archerGradient);
+        makeGradient(forest.x(), forest.y(), 2, 2, 1, peasantGradient);
+        makeGradient(forest.x(), forest.y(), 2, 2, 1, graizerGradient);
+        makeGradient(forest.x(), forest.y(), 2, 2, 1, griffonGradient);
+        makeGradient(forest.x(), forest.y(), 2, 2, 1, wereGradient);
+    }
+
 
     private void updateCastleGradients(Castle castle) {
         if (castle.owner == null) {
@@ -551,17 +604,23 @@ public class World {
             makeGradient(castle.x(), castle.y(), 20, 2, 10, archerGradient);
             makeGradient(castle.x(), castle.y(), 20, 2, 10, infanrtyfurGradient);
             makeGradient(castle.x(), castle.y(), 20, 2, 10, arbalesterGradient);
+            makeGradient(castle.x(), castle.y(), 40, 2, 20, griffonGradient);
+            makeGradient(castle.x(), castle.y(), 40, 2, 20, wereGradient);
         } else {
             if (castle.owner().furries) {
                 makeGradient(castle.x(), castle.y(), 10, 2, 5, infanrtyfurGradient);
                 makeGradient(castle.x(), castle.y(), 20, 4, 5, arbalesterGradient);
                 makeGradient(castle.x(), castle.y(), 45, 3, 15, swordsmanGradient);
                 makeGradient(castle.x(), castle.y(), 45, 3, 15, archerGradient);
+                makeGradient(castle.x(), castle.y(), 30, 3, 10, griffonGradient);
+                makeGradient(castle.x(), castle.y(), 10, 2, 2, wereGradient);
             } else {
                 makeGradient(castle.x(), castle.y(), 10, 2, 5, swordsmanGradient);
                 makeGradient(castle.x(), castle.y(), 20, 4, 5, archerGradient);
                 makeGradient(castle.x(), castle.y(), 45, 3, 15, infanrtyfurGradient);
                 makeGradient(castle.x(), castle.y(), 45, 3, 15, arbalesterGradient);
+                makeGradient(castle.x(), castle.y(), 30, 3, 10, wereGradient);
+                makeGradient(castle.x(), castle.y(), 10, 2, 2, griffonGradient);
             }
         }
     }
@@ -571,13 +630,34 @@ public class World {
         makeGradient(farm.x(), farm.y(), 10, 1, 10, archerGradient);
         makeGradient(farm.x(), farm.y(), 10, 1, 10, infanrtyfurGradient);
         makeGradient(farm.x(), farm.y(), 10, 1, 10, arbalesterGradient);
+        makeGradient(farm.x(), farm.y(), 40, 1, 40, wereGradient);
+        makeGradient(farm.x(), farm.y(), 40, 1, 40, griffonGradient);
+
         if (farm.owner != null) {
             if (farm.owner.furries) {
+                makeGradient(farm.x(), farm.y(), -40, -1, 40, wereGradient);
                 makeGradient(farm.x(), farm.y(), 4, graizerGradient);
             } else {
+                makeGradient(farm.x(), farm.y(), -40, -1, 40, griffonGradient);
                 makeGradient(farm.x(), farm.y(), 4, peasantGradient);
             }
         }
+    }
+
+    private void updateGriffonGradients(Griffon griffon) {
+        makeGradient(griffon.x(), griffon.y(), 80, 10, 6, infanrtyfurGradient);
+        makeGradient(griffon.x(), griffon.y(), 50, 10, 5, arbalesterGradient);
+        makeGradient(griffon.x(), griffon.y(), 50, 10, 5, wereGradient);
+        makeGradient(griffon.x(), griffon.y(), -40, -20, 2, arbalesterGradient);
+        makeGradient(griffon.x(), griffon.y(), -50, -25, 2, graizerGradient);
+    }
+
+    private void updateWereGradients(Were were) {
+        makeGradient(were.x(), were.y(), 80, 10, 6, swordsmanGradient);
+        makeGradient(were.x(), were.y(), 50, 10, 5, archerGradient);
+        makeGradient(were.x(), were.y(), 50, 10, 5, griffonGradient);
+        makeGradient(were.x(), were.y(), -40, -20, 2, archerGradient);
+        makeGradient(were.x(), were.y(), -50, -25, 2, peasantGradient);
     }
 
     private void updateSwordsmanGradients(Swordsman swordsman) {
@@ -586,17 +666,20 @@ public class World {
         makeGradient(swordsman.x(), swordsman.y(), 80, 10, 6, arbalesterGradient);
         makeGradient(swordsman.x(), swordsman.y(), -40, -20, 2, arbalesterGradient);
         makeGradient(swordsman.x(), swordsman.y(), -50, -25, 2, graizerGradient);
+        makeGradient(swordsman.x(), swordsman.y(), 50, 10, 5, wereGradient);
     }
 
     private void updateInfantryfurGradients(Infantryfur infantryfur) {
         makeGradient(infantryfur.x(), infantryfur.y(), 10, 1, 10, infanrtyfurGradient);
         makeGradient(infantryfur.x(), infantryfur.y(), 50, 10, 5, swordsmanGradient);
+        makeGradient(infantryfur.x(), infantryfur.y(), 50, 10, 5, griffonGradient);
         makeGradient(infantryfur.x(), infantryfur.y(), 80, 10, 6, archerGradient);
         makeGradient(infantryfur.x(), infantryfur.y(), -40, -20, 2, archerGradient);
         makeGradient(infantryfur.x(), infantryfur.y(), -50, -25, 2, peasantGradient);
     }
 
     private void updateArbalesterGradients(Arbalester arbalester) {
+        makeGradient(arbalester.x(), arbalester.y(), 80, 10, 6, griffonGradient);
         makeGradient(arbalester.x(), arbalester.y(), 40, 4, 10, infanrtyfurGradient);
         makeGradient(arbalester.x(), arbalester.y(), 80, 10, 5, swordsmanGradient);
         makeGradient(arbalester.x(), arbalester.y(), 50, 10, 6, archerGradient);
@@ -604,6 +687,7 @@ public class World {
     }
 
     private void updateArcherGradients(Archer archer) {
+        makeGradient(archer.x(), archer.y(), 80, 10, 6, wereGradient);
         makeGradient(archer.x(), archer.y(), 30, 3, 10, swordsmanGradient);
         makeGradient(archer.x(), archer.y(), 80, 10, 5, infanrtyfurGradient);
         makeGradient(archer.x(), archer.y(), 50, 10, 6, arbalesterGradient);
@@ -611,11 +695,13 @@ public class World {
     }
 
     private void updateGraizerGradients(Graizer graizer) {
+        makeGradient(graizer.x(), graizer.y(), 120, 10, 10, griffonGradient);
         makeGradient(graizer.x(), graizer.y(), 100, 10, 10, archerGradient);
         makeGradient(graizer.x(), graizer.y(), 100, 10, 10, swordsmanGradient);
     }
 
     private void updatePeasantGradients(Peasant peasant) {
+        makeGradient(peasant.x(), peasant.y(), 120, 10, 10, wereGradient);
         makeGradient(peasant.x(), peasant.y(), 100, 10, 10, arbalesterGradient);
         makeGradient(peasant.x(), peasant.y(), 100, 10, 10, infanrtyfurGradient);
     }

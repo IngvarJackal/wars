@@ -6,9 +6,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import io.github.ingvarjackal.wars.buildings.Capital;
-import io.github.ingvarjackal.wars.buildings.Castle;
-import io.github.ingvarjackal.wars.buildings.Farm;
+import io.github.ingvarjackal.wars.buildings.*;
 import io.github.ingvarjackal.wars.engine.Building;
 import io.github.ingvarjackal.wars.engine.Player;
 import io.github.ingvarjackal.wars.engine.World;
@@ -40,37 +38,39 @@ public class WarsServer extends ApplicationAdapter {
         assetManager.load("farm.png", Texture.class);
         assetManager.load("humanfarm.png", Texture.class);
         assetManager.load("furryfarm.png", Texture.class);
+        assetManager.load("forest.png", Texture.class);
+        assetManager.load("river.png", Texture.class);
+        assetManager.load("plain.png", Texture.class);
+        assetManager.load("mountain.png", Texture.class);
+        assetManager.load("were.png", Texture.class);
+        assetManager.load("griffon.png", Texture.class);
         assetManager.finishLoading();
         human = new Player(false, "Human");
         furry = new Player(true, "Furry");
-        human.infantry = 10;
-        human.archers = 5;
+        human.infantry = 30;
+        human.archers = 20;
+        human.chivalry = 5;
         human.peasants = 2;
-        furry.infantry = 10;
-        furry.archers = 5;
+        furry.infantry = 30;
+        furry.archers = 20;
+        furry.chivalry = 5;
         furry.peasants = 2;
-        world = new World(new Building[][]{
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, new Capital(human,1, 1), null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, null, null, null, null, null, null, null, null, null, null ,null,null,null,null,null,new Castle(null, 16 ,2),null,null,null},
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,new Farm(null, 17, 6),null,null,null},
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, null, null, null, new Farm(null, 3, 15), null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, null, new Castle(null, 2 ,16), null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,new Capital(furry, 18, 17),null},
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null},
-                {null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null}
-        });
+        world = new World(readBuildings(
+                 ".....t...........rr...........\n" +
+                        ".1...........c....r....t......\n" +
+                        "........t..t..................\n" +
+                        "t....t..t.............mmtm.f..\n" +
+                        "..f....t..t.....r.......mmm...\n" +
+                        "......t..tt....rrr...........m\n" +
+                        "..t.t.....t...r.rr..........m.\n" +
+                        ".......t..............t.......\n" +
+                        ".............c......t...t.....\n" +
+                        ".tm.mmm...rrr...ttt..t...t.t..\n" +
+                        "m.tm.m....rrrr...t.t..t....f..\n" +
+                        "....m....r......t.t.t...t.....\n" +
+                        "...t..........................\n" +
+                        ".f...r..........c...........2.\n" +
+                        "....t.rr............t.....t..."));
 	}
 
     private float timePassed = 0f;
@@ -98,4 +98,33 @@ public class WarsServer extends ApplicationAdapter {
 		batch.dispose();
         assetManager.dispose();
 	}
+
+	private Building[][] readBuildings(String input) {
+        String[] lines = input.split("\n");
+        Building[][] buildings = new Building[lines[0].length()][lines.length];
+        for (int i = 0; i < lines.length; i++) {
+            for (int j = 0; j < lines[i].length(); j++) {
+                switch (lines[i].charAt(j)) {
+                    case '.': { // Plain
+                        buildings[j][i] = new Plain(j, i); break;
+                    } case '1': { // Human player spawn
+                        buildings[j][i] = new Capital(human, j, i); break;
+                    } case '2': { // Furry player spawn
+                        buildings[j][i] = new Capital(furry, j, i); break;
+                    } case 't': { // Forest
+                        buildings[j][i] = new Forest(j, i); break;
+                    } case 'm': { // Mountain
+                        buildings[j][i] = new Mountain(j, i); break;
+                    } case 'r': { // River
+                        buildings[j][i] = new River(j, i); break;
+                    } case 'c': { // Castle
+                        buildings[j][i] = new Castle(null, j, i); break;
+                    } case 'f': { // Farm
+                        buildings[j][i] = new Farm(null, j, i); break;
+                    }
+                }
+            }
+        }
+        return buildings;
+    }
 }

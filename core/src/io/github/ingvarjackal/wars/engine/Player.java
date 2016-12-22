@@ -15,7 +15,7 @@ public class Player {
     public int infantryFlags;
     public int heavyInfantryFlags;
     public int archersFlags;
-    public int cavalaryFlags;
+    public int chivalryFlags;
 
     public int food = 10;
 
@@ -54,7 +54,7 @@ public class Player {
                 ", infantryFlags=" + infantryFlags +
                 ", heavyInfantryFlags=" + heavyInfantryFlags +
                 ", archersFlags=" + archersFlags +
-                ", cavalaryFlags=" + cavalaryFlags +
+                ", chivalryFlags=" + chivalryFlags +
                 ", food=" + food +
                 '}';
     }
